@@ -1,0 +1,67 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="auction">
+    <div class="auction-container">
+        <div class="auction-image">
+            <img src="{{ auction.image.url }}" alt="{{ auction.title }}">
+        </div>
+        <div class="auction-info">
+            <h3 class="auction-info-title">{{ auction.title }}</h3>
+            <p class="auction-info-price"><span class="auction-info-price-text">Price:</span> ${{ auction.current_price }}</p>
+            <p class="auction-info-description">{{ auction.description }}</p>
+            <p class="auction-info-date">Created {{ auction.created_date }}</p>
+            {% for comment in comments %}
+            <p class="auction-info-date">{{comment}}</p>
+            {% endfor %}
+        </div>
+        {% if user.is_authenticated %}
+        {%if auction.active %}
+        <form action="{% url 'add_bid' auction.id %}" method="post">
+            {% csrf_token %}
+            {{ form_bid.as_p }}
+                <input type="submit" class="btn btn-primary" value="Make a bid!">
+        </form>
+        {% if message_bid %}
+        {{message_bid}}
+        {% endif %}
+
+        {% if is_creator %}
+        <form action="{% url 'close_auction' auction.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-primary" value="Close the auction!">
+        </form>
+        {% endif %}
+
+        {% if is_watcher %}
+        <div>
+            <form action="{% url 'remove_watchlist' auction.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Remove from watchlist">
+            </form>
+
+            {% else %}
+            <form action="{% url 'add_watchlist' auction.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Add to watchlist">
+            </form>
+        </div>
+        {% endif %}
+
+        {% else %}
+        Auction is not active!
+        {% endif %}
+        {% if is_winner %}
+        Congrats you won the auction!
+        {% endif %}
+        <div>
+            <form action="{% url 'add_comment' auction.id %}" method="post">
+                {% csrf_token %}
+                {{ form_add.as_p }}
+                <input type="submit" value="Add comment!">
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+{% endblock %}
