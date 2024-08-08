@@ -13,7 +13,7 @@ class NewBidForm(forms.Form):
 
 
 class NewCommentForm(forms.Form):
-    comment = forms.CharField(label="comment", widget=forms.Textarea(attrs={'class': 'my-content-class'}))
+    comment = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
 
 
 class NewAuctionForm(forms.Form):
@@ -22,6 +22,7 @@ class NewAuctionForm(forms.Form):
     initial_price = forms.DecimalField(label="Initial Price", decimal_places=2, max_digits=10, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     image = forms.ImageField(label="Image", required=False)
     category = forms.ModelChoiceField(label="Category", queryset=Category.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+
 
 
 
@@ -120,7 +121,7 @@ def categories_details(request, category_id):
     })
 
 
-
+@login_required
 def watchlist(request):
     user = request.user
     watchlist = Auction.objects.filter(watchers=user)
@@ -128,7 +129,6 @@ def watchlist(request):
                   {"watchlist": watchlist
                                         }
                   )
-
 def auction(request, auction_id):
     auction = Auction.objects.get(pk=auction_id)
     is_watcher = request.user in auction.watchers.all()
@@ -172,6 +172,7 @@ def remove_watchlist(request, auction_id):
 @login_required
 def add_bid(request, auction_id):
     auction = Auction.objects.get(pk = auction_id)
+    comments = auction.comments.all()
     if request.method == "POST":
         user = request.user
         form_bid = NewBidForm(request.POST)
@@ -189,7 +190,9 @@ def add_bid(request, auction_id):
             form_bid = NewBidForm()
     return render(request, "auctions/auction.html", {"form_bid": form_bid,
                                                      "message_bid": message_bid,
-                                                     "auction": auction} )
+                                                     "auction": auction,
+                                                     "comments": comments,
+                                                     "form_add": NewCommentForm()} )
 
 @login_required
 def close_auction(request, auction_id):

@@ -12,7 +12,7 @@
                 <a href="{% url 'auction' auction_id=auction.id %}" class="auction-link"><h3 class="auction-info-title">{{ auction.title }}</h3></a> 
                 <p class="auction-info-price"><span class="auction-info-price-text">Price:</span> ${{ auction.current_price }}</p>
                 <p class="auction-info-description">{{ auction.description }}</p>
-                <p class="auction-info-date">Created {{ auction.created_date }}</p>
+                <p class="auction-info-date">Created {{ auction.created_date }} by {{ auction.creator }}</p>
             </div>
         </div>
     </div>

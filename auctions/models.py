@@ -14,7 +14,7 @@ class Category(models.Model):
 class Auction(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auctions")
     title = models.CharField(max_length=64)
-    image = models.ImageField(null=True, blank=True, upload_to="images/") 
+    image = models.ImageField(null=True, blank=True, upload_to="images") 
     description = models.TextField(null=True, blank=True) 
     initial_price = models.DecimalField(decimal_places=2, max_digits=10)
     watchers = models.ManyToManyField(User,  blank=True, related_name="watchlist")

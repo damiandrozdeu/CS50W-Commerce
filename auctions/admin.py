@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 
 
 class AuctionAdmin(admin.ModelAdmin):
-    list_display = ("id", "creator", "title", "image","description","initial_price", "current_price", "created_date" )
+    list_display = ("id", "creator", "title", "image","description","initial_price", "current_price", "created_date" ,"active")
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("id", "creator", "auction", "comment")

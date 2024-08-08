@@ -1,67 +1,108 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+
+{% if user.is_authenticated %}
+{%if auction.active %}
+
+{% if message_bid %}
+<div class="alert alert-danger" role="alert">
+    {{message_bid}}
+</div>
+{% endif %}
+{%else%}
+<div class="alert alert-danger" role="alert">
+    Auction is not active!
+</div>
+{% if is_winner %}
+<div class="alert alert-success" role="alert">
+    Congrats you won the auction!
+  </div>
+{% endif %}
+{% endif %}
+{% endif %}
+
 <div class="auction">
-    <div class="auction-container">
-        <div class="auction-image">
-            <img src="{{ auction.image.url }}" alt="{{ auction.title }}">
-        </div>
-        <div class="auction-info">
-            <h3 class="auction-info-title">{{ auction.title }}</h3>
-            <p class="auction-info-price"><span class="auction-info-price-text">Price:</span> ${{ auction.current_price }}</p>
-            <p class="auction-info-description">{{ auction.description }}</p>
-            <p class="auction-info-date">Created {{ auction.created_date }}</p>
-            {% for comment in comments %}
-            <p class="auction-info-date">{{comment}}</p>
-            {% endfor %}
-        </div>
-        {% if user.is_authenticated %}
-        {%if auction.active %}
-        <form action="{% url 'add_bid' auction.id %}" method="post">
-            {% csrf_token %}
-            {{ form_bid.as_p }}
-                <input type="submit" class="btn btn-primary" value="Make a bid!">
-        </form>
-        {% if message_bid %}
-        {{message_bid}}
-        {% endif %}
+    <div class="auction-container-auction">
+        <div class="auction-left">
+            <div class="auction-image">
+                <img src="{{ auction.image.url }}" alt="{{ auction.title }}">
+            </div>
+            <div class="auction-details">
+                <div class="auction-info">
+                    <h3 class="auction-info-title">{{ auction.title }}</h3>
+                    <p class="auction-info-price"><span class="auction-info-price-text">Price:</span>${{auction.current_price}}</p>
+                    <p class="auction-info-description">{{ auction.description }}</p>
+                    <p class="auction-info-date">Created {{ auction.created_date }} by {{ auction.creator }} </p>
+                </div>
+                <div class="auction-bids">
 
-        {% if is_creator %}
-        <form action="{% url 'close_auction' auction.id %}" method="post">
-            {% csrf_token %}
-            <input type="submit" class="btn btn-primary" value="Close the auction!">
-        </form>
-        {% endif %}
+                    {% if user.is_authenticated %}
+                    {%if auction.active %}
+                    <form action="{% url 'add_bid' auction.id %}" method="post">
+                        {% csrf_token %}
+                        {{ form_bid.as_p }}
+                        <input type="submit" class="btn btn-primary" value="Make a bid!">
+                    </form>
 
-        {% if is_watcher %}
-        <div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="auction-inputs">
+            {% if user.is_authenticated %}
+            {%if auction.active %}
+            {% if is_creator %}
+            <form action="{% url 'close_auction' auction.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary" value="Close the auction!">
+            </form>
+            {% endif %}
+
+            {% if is_watcher %}
             <form action="{% url 'remove_watchlist' auction.id %}" method="post">
                 {% csrf_token %}
-                <input type="submit" value="Remove from watchlist">
+                <input type="submit" class="btn btn-primary" value="Remove from watchlist">
             </form>
 
             {% else %}
             <form action="{% url 'add_watchlist' auction.id %}" method="post">
                 {% csrf_token %}
-                <input type="submit" value="Add to watchlist">
+                <input type="submit" class="btn btn-primary" value="Add to watchlist">
             </form>
-        </div>
-        {% endif %}
+            {% endif %}
+            {% endif %}
 
-        {% else %}
-        Auction is not active!
-        {% endif %}
-        {% if is_winner %}
-        Congrats you won the auction!
-        {% endif %}
-        <div>
-            <form action="{% url 'add_comment' auction.id %}" method="post">
-                {% csrf_token %}
-                {{ form_add.as_p }}
-                <input type="submit" value="Add comment!">
-            </form>
-        </div>
-        {% endif %}
+            {% endif %}
 
+
+        </div>
     </div>
+</div>
+{% if user.is_authenticated %}
+{%if auction.active %}
+<div class="comments">
+    <div class="comments-add">
+            <form class="form_add" action="{% url 'add_comment' auction.id %}" method="post">
+                {% csrf_token %}
+                {{ form_add }}
+                <input type="submit" class="btn btn-primary" value="Add comment!">
+            </form>
+            {% endif %}
+        </div>
+        <div class="comments-list">
+            <h1>Comment</h1>
+            {% for comment in comments %}
+            <div class="comments-list-comment">
+                <p> {{comment.creator}}</p>
+                <p>{{comment}}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
 {% endblock %}
